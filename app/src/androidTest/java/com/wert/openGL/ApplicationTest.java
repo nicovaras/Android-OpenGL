@@ -1,4 +1,4 @@
-package com.example.wert.opengl;
+package com.wert.openGL;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

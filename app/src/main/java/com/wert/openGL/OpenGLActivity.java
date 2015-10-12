@@ -1,4 +1,4 @@
-package com.example.wert.opengl;
+package com.wert.openGL;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -6,9 +6,10 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.wert.openGL.R;
 
 public class OpenGLActivity extends AppCompatActivity {
 
@@ -27,7 +28,7 @@ public class OpenGLActivity extends AppCompatActivity {
 
         if(supportsOGL){
             glSurfaceView.setEGLContextClientVersion(2);
-            glSurfaceView.setRenderer(new OpenGLRenderer());
+            glSurfaceView.setRenderer(new OpenGLRenderer(this));
             rendererSet = true;
         }
 
