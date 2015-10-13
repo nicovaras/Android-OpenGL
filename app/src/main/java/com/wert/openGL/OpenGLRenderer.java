@@ -21,9 +21,11 @@ import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
 import static android.opengl.GLES20.glUniform4f;
+import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glUseProgram;
 import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
+import android.opengl.Matrix;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -37,42 +39,44 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     private static final int STRIDE = (POSITION_COMPONENTS + COLOR_COMPONENTS) * BYTES_FLOAT;
     private static final String A_COLOR = "a_Color";
     private static final String A_POSITION = "a_Position";
+    private static final String U_MATRIX = "u_Matrix";
     private int aColorLocation;
     private int aPositionLocation;
+    private int uMatrixLocation;
     private final FloatBuffer vertexData;
     private final Context context;
+    private final float[] projectionMatrix = new float[16];
 
     public OpenGLRenderer(Context context){
         this.context = context;
         float[] tableVertices = {
                 // Board
-                0, 0, 1f,1f,1f,
-                -0.5f, -0.5f, 0.7f,0.7f,0.7f,
-                0f, -0.5f, 1f,1f,1f,
-                0.5f, -0.5f,0.7f,0.7f,0.7f,
-                0.5f, 0f,1f,1f,1f,
-                0.5f, 0.5f,0.7f,0.7f,0.7f,
-                0f, 0.5f,1f,1f,1f,
-                -0.5f, 0.5f,0.7f,0.7f,0.7f,
-                -0.5f, 0f,1f,1f,1f,
-                -0.5f, -0.5f,0.7f,0.7f,0.7f,
+                    0,     0,   1f,   1f,   1f,
+                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                   0f, -0.8f,   1f,   1f,   1f,
+                 0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                 0.5f,    0f,   1f,   1f,   1f,
+                 0.5f,  0.8f, 0.7f, 0.7f, 0.7f,
+                   0f,  0.8f,   1f,   1f,   1f,
+                -0.5f,  0.8f, 0.7f, 0.7f, 0.7f,
+                -0.5f,    0f,   1f,   1f,   1f,
+                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
 
                 // Line
-                -0.5f, 0f,1f,0.5f,0.2f,
-                0.5f, 0f,.2f,0.4f,0.8f,
+                -0.5f,    0f,   1f, 0.5f, 0.2f,
+                 0.5f,    0f,  .2f, 0.4f, 0.8f,
 
                 //Players
-                0f, -0.25f,1f,0f,1f,
-                0f, 0.25f,1f,0f,0f,
+                   0f, -0.25f,  1f,   0f,   1f,
+                   0f,  0.25f,  1f,   0f,   0f,
 
                 // Board external
-                -0.6f, -0.55f,0f,0f,0f,
-                0.6f, 0.55f,0f,0f,0f,
-                -0.6f, 0.55f,0f,0f,0f,
-
-                -0.6f, -0.55f,0f,0f,0f,
-                0.6f, -0.55f,0f,0f,0f,
-                0.6f, 0.55f,0f,0f,0f
+                -0.6f, -0.85f,0f,0f,0f,
+                 0.6f,  0.85f,0f,0f,0f,
+                -0.6f,  0.85f,0f,0f,0f,
+                -0.6f, -0.85f,0f,0f,0f,
+                 0.6f, -0.85f,0f,0f,0f,
+                 0.6f,  0.85f,0f,0f,0f
         };
         vertexData = ByteBuffer.allocateDirect(tableVertices.length * BYTES_FLOAT)
                                .order(ByteOrder.nativeOrder())
@@ -95,6 +99,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
 
         aColorLocation = glGetAttribLocation(program, A_COLOR);
         aPositionLocation = glGetAttribLocation(program, A_POSITION);
+        uMatrixLocation = glGetUniformLocation(program, U_MATRIX);
 
         vertexData.position(0);
         glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, false, STRIDE, vertexData);
@@ -108,6 +113,15 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         glViewport(0, 0, width, height);
+        final float aspectRatio = width > height ?
+                (float) width / (float) height:
+                (float) height/ (float) width;
+
+        if(width > height){
+            Matrix.orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
+        } else {
+            Matrix.orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
+        }
     }
 
     @Override
@@ -118,5 +132,6 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         glDrawArrays(GL_LINES, 10, 2);
         glDrawArrays(GL_POINTS, 12, 1);
         glDrawArrays(GL_POINTS, 13, 1);
+        glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
     }
 }
