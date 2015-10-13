@@ -33,7 +33,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 
 public class OpenGLRenderer implements GLSurfaceView.Renderer {
-    private static final int POSITION_COMPONENTS = 2;
+    private static final int POSITION_COMPONENTS = 4;
     private static final int COLOR_COMPONENTS = 3;
     private static final int BYTES_FLOAT= 4;
     private static final int STRIDE = (POSITION_COMPONENTS + COLOR_COMPONENTS) * BYTES_FLOAT;
@@ -51,32 +51,32 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         this.context = context;
         float[] tableVertices = {
                 // Board
-                    0,     0,   1f,   1f,   1f,
-                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
-                   0f, -0.8f,   1f,   1f,   1f,
-                 0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
-                 0.5f,    0f,   1f,   1f,   1f,
-                 0.5f,  0.8f, 0.7f, 0.7f, 0.7f,
-                   0f,  0.8f,   1f,   1f,   1f,
-                -0.5f,  0.8f, 0.7f, 0.7f, 0.7f,
-                -0.5f,    0f,   1f,   1f,   1f,
-                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                    0,     0,    0, 1.4f,   1f,   1f,   1f,
+                -0.5f, -0.8f,    0, 1.f, 0.7f, 0.7f, 0.7f,
+                   0f, -0.8f,    0, 1.f,   1f,   1f,   1f,
+                 0.5f, -0.8f,    0, 1.f, 0.7f, 0.7f, 0.7f,
+                 0.5f,    0f,    0, 1.4f,   1f,   1f,   1f,
+                 0.5f,  0.8f,    0, 1.8f, 0.7f, 0.7f, 0.7f,
+                   0f,  0.8f,    0, 1.8f,   1f,   1f,   1f,
+                -0.5f,  0.8f,    0, 1.8f, 0.7f, 0.7f, 0.7f,
+                -0.5f,    0f,    0, 1.4f,   1f,   1f,   1f,
+                -0.5f, -0.8f,    0, 1.f, 0.7f, 0.7f, 0.7f,
 
                 // Line
-                -0.5f,    0f,   1f, 0.5f, 0.2f,
-                 0.5f,    0f,  .2f, 0.4f, 0.8f,
+                -0.5f,    0f,    0, 1.4f,   1f, 0.5f, 0.2f,
+                 0.5f,    0f,    0, 1.4f,  .2f, 0.4f, 0.8f,
 
                 //Players
-                   0f, -0.25f,  1f,   0f,   1f,
-                   0f,  0.25f,  1f,   0f,   0f,
+                   0f, -0.6f,    0, 1f,  0f,   0f,   1f,
+                   0f,  0.6f,    0, 1.8f,  1f,   0f,   0f,
 
                 // Board external
-                -0.6f, -0.85f,0f,0f,0f,
-                 0.6f,  0.85f,0f,0f,0f,
-                -0.6f,  0.85f,0f,0f,0f,
-                -0.6f, -0.85f,0f,0f,0f,
-                 0.6f, -0.85f,0f,0f,0f,
-                 0.6f,  0.85f,0f,0f,0f
+                -0.6f, -0.85f,    0, 1.f,0f,0f,0f,
+                 0.6f,  0.85f,    0, 1.8f,0f,0f,0f,
+                -0.6f,  0.85f,    0, 1.8f,0f,0f,0f,
+                -0.6f, -0.85f,    0, 1.f,0f,0f,0f,
+                 0.6f, -0.85f,    0, 1.f,0f,0f,0f,
+                 0.6f,  0.85f,    0, 1.8f,0f,0f,0f
         };
         vertexData = ByteBuffer.allocateDirect(tableVertices.length * BYTES_FLOAT)
                                .order(ByteOrder.nativeOrder())
@@ -102,7 +102,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         uMatrixLocation = glGetUniformLocation(program, U_MATRIX);
 
         vertexData.position(0);
-        glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, false, STRIDE, vertexData);
+        glVertexAttribPointer(aPositionLocation, POSITION_COMPONENTS, GL_FLOAT, false, STRIDE, vertexData);
         glEnableVertexAttribArray(aPositionLocation);
 
         vertexData.position(POSITION_COMPONENTS);
