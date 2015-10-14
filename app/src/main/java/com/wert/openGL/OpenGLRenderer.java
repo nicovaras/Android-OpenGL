@@ -46,6 +46,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     private final FloatBuffer vertexData;
     private final Context context;
     private final float[] projectionMatrix = new float[16];
+    private final float[] modelMatrix = new float[16];
 
     public OpenGLRenderer(Context context){
         this.context = context;
@@ -113,15 +114,14 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         glViewport(0, 0, width, height);
-        final float aspectRatio = width > height ?
-                (float) width / (float) height:
-                (float) height/ (float) width;
-
-        if(width > height){
-            Matrix.orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
-        } else {
-            Matrix.orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
-        }
+        Matrix.perspectiveM(projectionMatrix, 0, 40,
+                (float) width / (float) height, 1f, 10f);
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, 0f, 0f, -2.5f);
+        Matrix.rotateM(modelMatrix, 0, -60f, 1f, 0f, 0f);
+        final float[] tmp = new float[16];
+        Matrix.multiplyMM(tmp, 0, projectionMatrix, 0, modelMatrix, 0);
+        System.arraycopy(tmp, 0, projectionMatrix, 0, tmp.length);
     }
 
     @Override
